@@ -7,10 +7,12 @@ class Card extends Component {
     return (
       <div style={{ display: "flex", backgroundColor: this.props.active ? 'blue' : '#fff' }}>
         {this.props.items.map((item, i) => {
+          const active = this.props.currentImageId === i && this.props.active;
+          const isCurrentZoomed = this.props.isZoomed && active;
           return (
             <CardItem
-              isZoomed={this.props.isZoomed}
-              active={this.props.currentImageId === i && this.props.active}
+              isZoomed={isCurrentZoomed}
+              active={active}
               key={item.image}
               image={item.image}
               url={item.url}
