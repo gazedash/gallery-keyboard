@@ -5,9 +5,17 @@ import PropTypes from "prop-types";
 class Card extends Component {
   render() {
     return (
-      <div>
-        {this.props.items.map(item => {
-          return <CardItem key={item.image} image={item.image} url={item.url} />;
+      <div style={{ display: "flex", backgroundColor: this.props.active ? 'blue' : '#fff' }}>
+        {this.props.items.map((item, i) => {
+          return (
+            <CardItem
+              isZoomed={this.props.isZoomed}
+              active={this.props.currentImageId === i && this.props.active}
+              key={item.image}
+              image={item.image}
+              url={item.url}
+            />
+          );
         })}
       </div>
     );
@@ -16,12 +24,14 @@ class Card extends Component {
 
 Card.propTypes = {
   items: PropTypes.array,
-  currentId: PropTypes.number
+  isZoomed: PropTypes.bool,
+  active: PropTypes.bool,
+  currentImageId: PropTypes.number
 };
 
 Card.defaultProps = {
   items: [],
-  currentId: 0
+  isZoomed: false,
 };
 
 export default Card;
