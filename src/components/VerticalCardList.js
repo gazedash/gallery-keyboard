@@ -37,6 +37,12 @@ import React, { Component } from "react";
 import Card from "./Card";
 import data from "../data.json";
 class VerticalCardList extends Component {
+  zoomKey = "KeyG";
+  leftKey = "KeyH";
+  rightKey = "KeyL";
+  upKey = "KeyJ";
+  downKey = "KeyK";
+
   state = {
     currentCard: 0,
     currentImage: 0,
@@ -47,36 +53,101 @@ class VerticalCardList extends Component {
     window.addEventListener("keypress", this.handleKeyPress);
   }
 
-  handleKeyPress = this.handleKeyPress.bind(this);
-  handleKeyPress(e) {
-    const { isZoomed, currentImage, currentCard } = this.state;
-    if (e.code === "KeyG") {
+  setZoomed(code) {
+    const { isZoomed } = this.state;
+    if (this.isZoomKey(code)) {
       this.setState({
         isZoomed: !isZoomed
       });
     }
-    if (e.code === "KeyH" || e.code === "KeyL") {
-      const diff = e.code === "KeyH" ? -1 : e.code === "KeyL" ? 1 : 0;
-      const limit = data[this.state.currentCard].images.length;
-      const currentPlusDiff = currentImage + diff;
+  }
+
+  isZoomKey(code) {
+    return code === this.zoomKey;
+  }
+
+  isUpKey(code) {
+    return code === this.upKey;
+  }
+
+  isDownKey(code) {
+    return code === this.downKey;
+  }
+
+  isLeftKey(code) {
+    return code === this.leftKey;
+  }
+
+  isRightKey(code) {
+    return code === this.rightKey;
+  }
+
+  moveSide(code) {
+    const isLeftKey = this.isLeftKey(code);
+    const isRightKey = this.isRightKey(code);
+    if (isLeftKey || isRightKey) {
       this.setState(oldState => ({
-        currentImage: this.moveHor(currentPlusDiff, limit)
-      }));
-    }
-    if (e.code === "KeyJ" || e.code === "KeyK") {
-      const diff = e.code === "KeyJ" ? -1 : e.code === "KeyK" ? 1 : 0;
-      const limit = data.length;
-      const currentPlusDiff = currentCard + diff;
-      const newCard = this.moveHor(currentPlusDiff, limit);
-      const newLimit = data[newCard].images.length;
-      this.setState(oldState => ({
-        currentCard: newCard,
-        currentImage: currentImage >= newLimit ? 0 : currentImage
+        currentImage: this.getNextImage(isLeftKey, isRightKey)
       }));
     }
   }
 
-  moveHor(currentPlusDiff, limit, loop = false) {
+  getNextImage(isLeftKey, isRightKey) {
+    const { currentImage } = this.state;
+    const diff = this.minusOneOrZeroOrOne(isLeftKey, isRightKey);
+    const limit = this.currentImagesLength;
+    const currentPlusDiff = currentImage + diff;
+    return this.move(currentPlusDiff, limit, true);
+  }
+
+  minusOneOrZeroOrOne(first, second) {
+    return first ? -1 : second ? 1 : 0;
+  }
+
+  handleKeyPress = this.handleKeyPress.bind(this);
+  handleKeyPress(e) {
+    const { code } = e;
+    this.setZoomed(code);
+    this.moveSide(code);
+    this.moveHor(code);
+  }
+
+  get currentImagesLength() {
+    const { currentCard } = this.state;
+    return this.getImagesLength(currentCard);
+  }
+
+  getImagesLength(index) {
+    return data[index].images.length;
+  }
+
+  getNextCard(isUpKey, isDownKey) {
+    const { currentCard } = this.state;
+    const diff = this.minusOneOrZeroOrOne(isUpKey, isDownKey);
+    const limit = data.length;
+    const currentPlusDiff = currentCard + diff;
+    return this.move(currentPlusDiff, limit);
+  }
+
+  moveHor(code) {
+    const isUpKey = this.isUpKey(code);
+    const isDownKey = this.isDownKey(code);
+    if (isUpKey || isDownKey) {
+      const newCard = this.getNextCard(isUpKey, isDownKey);
+      this.setState(oldState => ({
+        currentCard: newCard,
+        currentImage: this.adjustNextCardImagePosition(newCard)
+      }));
+    }
+  }
+
+  adjustNextCardImagePosition(newCard) {
+    const { currentImage } = this.state;
+    const newLimit = this.getImagesLength(newCard);
+    return currentImage >= newLimit ? 0 : currentImage;
+  }
+
+  move(currentPlusDiff, limit, loop = false) {
     let res = 0;
     const lastIndex = limit - 1;
     if (currentPlusDiff <= 0) {
@@ -91,27 +162,46 @@ class VerticalCardList extends Component {
     return res;
   }
 
+  isCardActive(index) {
+    const { currentCard } = this.state;
+    return currentCard === index;
+  }
+
+  mapDataToImages() {
+    return data.map((item, index) => {
+      const { url, name, images } = item;
+      const items = images.map(image => ({
+        image,
+        url,
+        name
+      }));
+      return {
+        items,
+        url,
+        name
+      };
+    });
+  }
+
+  renderCards() {
+    const { currentImage, isZoomed } = this.state;
+    return this.mapDataToImages().map((e, index) => {
+      return (
+        <Card
+          isZoomed={isZoomed}
+          active={this.isCardActive(index)}
+          currentImageId={currentImage}
+          key={e.name}
+          items={e.items}
+        />
+      );
+    });
+  }
+
   render() {
     return (
       <div style={{ display: "flex", flexDirection: "column" }}>
-        {data.map((e, i) => {
-          const items = e.images.map(image => {
-            return {
-              image,
-              url: e.url,
-              name: e.name
-            };
-          });
-          return (
-            <Card
-              isZoomed={this.state.isZoomed}
-              active={this.state.currentCard === i}
-              currentImageId={this.state.currentImage}
-              key={e.name}
-              items={items}
-            />
-          );
-        })}
+        {this.renderCards()}
       </div>
     );
   }
