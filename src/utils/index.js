@@ -40,3 +40,7 @@ export function getNext({ isPrevKey, isNextKey, limit, current, loop = false }) 
   const currentPlusDiff = current + diff;
   return move(currentPlusDiff, limit, loop);
 }
+
+export function isObjectEmpty(obj) {
+      return Object.keys(obj).length === 0;
+}
