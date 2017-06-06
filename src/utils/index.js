@@ -16,22 +16,27 @@ export function validateKey(testKey, refKey) {
   }
 }
 
-  export function minusOneOrZeroOrOne(first, second) {
-    return first ? -1 : second ? 1 : 0;
-  }
+export function minusOneOrZeroOrOne(first, second) {
+  return first ? -1 : second ? 1 : 0;
+}
 
-
-  export function move(currentPlusDiff, limit, loop = false) {
-    let res = 0;
-    const lastIndex = limit - 1;
-    if (currentPlusDiff <= 0) {
-      res = loop ? lastIndex : 0;
+export function move(currentPlusDiff, limit, loop = false) {
+  let res = 0;
+  const lastIndex = limit - 1;
+  if (currentPlusDiff <= 0) {
+    res = loop ? lastIndex : 0;
+  } else {
+    if (currentPlusDiff < limit) {
+      res = currentPlusDiff;
     } else {
-      if (currentPlusDiff < limit) {
-        res = currentPlusDiff;
-      } else {
-        res = loop ? 0 : lastIndex;
-      }
+      res = loop ? 0 : lastIndex;
     }
-    return res;
   }
+  return res;
+}
+
+export function getNext({ isNextKey, isPrevKey, limit, current }) {
+  const diff = minusOneOrZeroOrOne(isNextKey, isPrevKey);
+  const currentPlusDiff = current + diff;
+  return move(currentPlusDiff, limit, true);
+}
