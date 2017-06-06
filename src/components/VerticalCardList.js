@@ -37,7 +37,7 @@ import React, { Component } from "react";
 import Card from "./Card";
 import data from "../data.json";
 import PropTypes from "prop-types";
-
+import { validateKey, minusOneOrZeroOrOne, move } from "../utils";
 class VerticalCardList extends Component {
   state = {
     currentCard: 0,
@@ -49,46 +49,28 @@ class VerticalCardList extends Component {
     window.addEventListener("keydown", this.handleKeyPress);
   }
 
-  validateKey(testKey, refKey) {
-    const res = testKey === refKey;
-    if (res) {
-      // {key, altKey, ctrlKey, metaKey}
-      return res;
-    }
-    // iterate all keys of testKey
-    if (typeof testKey === "object") {
-      let testKeyObject = {};
-      for (let prop in testKey) {
-        testKeyObject[prop] = testKey[prop];
-      }
-      return Object.keys(refKey).every(key => {
-        return testKeyObject[key] === refKey[key];
-      });
-    }
-  }
-
   isZoomEscKey(code) {
-    return this.validateKey(code, this.props.zoomEscKey);
+    return validateKey(code, this.props.zoomEscKey);
   }
 
   isZoomKey(code) {
-    return this.validateKey(code, this.props.zoomKey);
+    return validateKey(code, this.props.zoomKey);
   }
 
   isUpKey(code) {
-    return this.validateKey(code, this.props.upKey);
+    return validateKey(code, this.props.upKey);
   }
 
   isDownKey(code) {
-    return this.validateKey(code, this.props.downKey);
+    return validateKey(code, this.props.downKey);
   }
 
   isLeftKey(code) {
-    return this.validateKey(code, this.props.leftKey);
+    return validateKey(code, this.props.leftKey);
   }
 
   isRightKey(code) {
-    return this.validateKey(code, this.props.rightKey);
+    return validateKey(code, this.props.rightKey);
   }
 
   setZoomed(code) {
@@ -132,21 +114,16 @@ class VerticalCardList extends Component {
 
   getNextImage(isLeftKey, isRightKey) {
     const { currentImage } = this.state;
-    const diff = this.minusOneOrZeroOrOne(isLeftKey, isRightKey);
+    const diff = minusOneOrZeroOrOne(isLeftKey, isRightKey);
     const limit = this.currentImagesLength;
     const currentPlusDiff = currentImage + diff;
-    return this.move(currentPlusDiff, limit, true);
-  }
-
-  minusOneOrZeroOrOne(first, second) {
-    return first ? -1 : second ? 1 : 0;
+    return move(currentPlusDiff, limit, true);
   }
 
   handleKeyPress = this.handleKeyPress.bind(this);
   handleKeyPress(e) {
     const { keyType } = this.props;
     const { [keyType]: code = e } = e;
-    console.log(keyType, code, e);
 
     this.setZoomed(code);
     this.moveSide(code);
@@ -165,31 +142,16 @@ class VerticalCardList extends Component {
 
   getNextCard(isUpKey, isDownKey) {
     const { currentCard } = this.state;
-    const diff = this.minusOneOrZeroOrOne(isUpKey, isDownKey);
+    const diff = minusOneOrZeroOrOne(isUpKey, isDownKey);
     const limit = data.length;
     const currentPlusDiff = currentCard + diff;
-    return this.move(currentPlusDiff, limit);
+    return move(currentPlusDiff, limit);
   }
 
   adjustNextCardImagePosition(newCard) {
     const { currentImage } = this.state;
     const newLimit = this.getImagesLength(newCard);
     return currentImage >= newLimit ? 0 : currentImage;
-  }
-
-  move(currentPlusDiff, limit, loop = false) {
-    let res = 0;
-    const lastIndex = limit - 1;
-    if (currentPlusDiff <= 0) {
-      res = loop ? lastIndex : 0;
-    } else {
-      if (currentPlusDiff < limit) {
-        res = currentPlusDiff;
-      } else {
-        res = loop ? 0 : lastIndex;
-      }
-    }
-    return res;
   }
 
   isCardActive(index) {
@@ -263,7 +225,7 @@ VerticalCardList.propTypes = {
 
 VerticalCardList.defaultProps = {
   keyType: "key",
-//  zoomKey: { key: "g", ctrlKey: true, altKey: true },
+  //  zoomKey: { key: "g", ctrlKey: true, altKey: true },
   zoomKey: "g",
   leftKey: "h",
   rightKey: "l",
