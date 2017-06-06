@@ -188,23 +188,45 @@ class VerticalCardList extends Component {
     });
   }
 
+  horizontalStyle = { display: "flex", flexDirection: "column" }
+  verticalStyle = { display: "flex" }
+  get horizontal() {
+    return this.props.horizontal;
+  }
+  get propsStyle() {
+    return this.props.style;
+  }
+  get style() {
+   if (this.propsStyle) {
+     return this.propsStyle;
+   }
+   if (this.horizontal) {
+     return this.horizontalStyle;
+   }
+   return this.verticalStyle;
+  }
   renderCards() {
-    return this.mapDataToImages().map((e, index) => {
-      return (
-        <Card
-          isZoomed={this.isZoomed}
-          active={this.isCardActive(index)}
-          currentImageId={this.currentImage}
-          key={e.name}
-          items={e.items}
-        />
-      );
-    });
+    return (
+      <div style={this.style}>
+        {this.mapDataToImages().map((e, index) => {
+          return (
+            <Card
+              horizontal={this.horizontal}
+              isZoomed={this.isZoomed}
+              active={this.isCardActive(index)}
+              currentImageId={this.currentImage}
+              key={e.name}
+              items={e.items}
+            />
+          );
+        })}
+      </div>
+    );
   }
 
   render() {
     return (
-      <div style={{ display: "flex", flexDirection: "column" }}>
+      <div>
         {this.renderCards()}
       </div>
     );
@@ -232,7 +254,9 @@ VerticalCardList.propTypes = {
   rightKey: StringOrNumberPropType,
   upKey: StringOrNumberPropType,
   downKey: StringOrNumberPropType,
-  zoomEscKey: StringOrNumberPropType
+  zoomEscKey: StringOrNumberPropType,
+  style: PropTypes.object,
+  horizontal: PropTypes.bool,
 };
 
 VerticalCardList.defaultProps = {
@@ -243,7 +267,9 @@ VerticalCardList.defaultProps = {
   rightKey: "l",
   upKey: "j",
   downKey: "k",
-  zoomEscKey: "Escape"
+  zoomEscKey: "Escape",
+  style: null,
+  horizontal: true,
 };
 
 export default VerticalCardList;
