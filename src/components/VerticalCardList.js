@@ -42,6 +42,7 @@ class VerticalCardList extends Component {
   rightKey = "KeyL";
   upKey = "KeyJ";
   downKey = "KeyK";
+  zoomEscKey = "Escape";
 
   state = {
     currentCard: 0,
@@ -50,7 +51,7 @@ class VerticalCardList extends Component {
   };
 
   componentDidMount() {
-    window.addEventListener("keypress", this.handleKeyPress);
+    window.addEventListener("keydown", this.handleKeyPress);
   }
 
   setZoomed(code) {
@@ -60,6 +61,18 @@ class VerticalCardList extends Component {
         isZoomed: !isZoomed
       });
     }
+  }
+
+  escapeZoom(code) {
+    if (this.isZoomEscKey(code)) {
+      this.setState({
+        isZoomed: false
+      });
+    }
+  }
+
+  isZoomEscKey(code) {
+    return code === this.zoomEscKey;
   }
 
   isZoomKey(code) {
@@ -110,6 +123,7 @@ class VerticalCardList extends Component {
     this.setZoomed(code);
     this.moveSide(code);
     this.moveHor(code);
+    this.escapeZoom(code);
   }
 
   get currentImagesLength() {
