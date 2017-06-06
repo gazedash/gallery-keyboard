@@ -118,7 +118,8 @@ class VerticalCardList extends Component {
       isPrevKey: isLeftKey,
       isNextKey: isRightKey,
       limit: this.currentImagesLength,
-      current: this.currentImage
+      current: this.currentImage,
+      loop: true
     });
   }
 

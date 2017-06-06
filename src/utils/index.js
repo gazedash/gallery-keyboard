@@ -35,8 +35,8 @@ export function move(currentPlusDiff, limit, loop = false) {
   return res;
 }
 
-export function getNext({ isNextKey, isPrevKey, limit, current }) {
-  const diff = minusOneOrZeroOrOne(isNextKey, isPrevKey);
+export function getNext({ isPrevKey, isNextKey, limit, current, loop = false }) {
+  const diff = minusOneOrZeroOrOne(isPrevKey, isNextKey);
   const currentPlusDiff = current + diff;
-  return move(currentPlusDiff, limit, true);
+  return move(currentPlusDiff, limit, loop);
 }
