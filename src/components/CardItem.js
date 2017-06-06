@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-
 class CardItem extends Component {
   defaultFixedStyle = {
     position: "fixed",
@@ -36,7 +35,7 @@ class CardItem extends Component {
 
   get fixedStyle() {
     const { fixedStyle } = this.props;
-    if (Object.keys(fixedStyle).length !== 0) {
+    if (fixedStyle) {
       return fixedStyle;
     }
     return this.defaultFixedStyle;
@@ -44,7 +43,7 @@ class CardItem extends Component {
 
   get activeStyle() {
     const { activeStyle, style } = this.props;
-    return this.active ? activeStyle : style;
+    return this.active && activeStyle ? activeStyle : style;
   }
 
   widthOrZoomWidth(zoomed) {
@@ -117,9 +116,9 @@ CardItem.defaultProps = {
   width: 128,
   zoomHeight: 600,
   zoomWidth: 600,
-  style: {},
-  fixedStyle: {},
-  activeStyle: {}
+  style: null,
+  fixedStyle: null,
+  activeStyle: null
 };
 
 export default CardItem;
