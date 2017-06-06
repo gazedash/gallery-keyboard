@@ -3,12 +3,24 @@ import CardItem from "./CardItem";
 import PropTypes from "prop-types";
 
 class Card extends Component {
+  get isZoomed() {
+    return this.props.isZoomed;
+  }
+
+  get active() {
+    return this.props.active;
+  }
+
+  get currentImageId() {
+    return this.props.currentImageId;
+  }
+
   render() {
     return (
       <div style={{ display: "flex", backgroundColor: this.props.active ? 'blue' : '#fff' }}>
         {this.props.items.map((item, i) => {
-          const active = this.props.currentImageId === i && this.props.active;
-          const isCurrentZoomed = this.props.isZoomed && active;
+          const active = this.currentImageId === i && this.active;
+          const isCurrentZoomed = this.isZoomed && active;
           return (
             <CardItem
               isZoomed={isCurrentZoomed}
