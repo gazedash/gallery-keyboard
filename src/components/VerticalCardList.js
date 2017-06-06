@@ -36,14 +36,9 @@
 import React, { Component } from "react";
 import Card from "./Card";
 import data from "../data.json";
-class VerticalCardList extends Component {
-  zoomKey = "KeyG";
-  leftKey = "KeyH";
-  rightKey = "KeyL";
-  upKey = "KeyJ";
-  downKey = "KeyK";
-  zoomEscKey = "Escape";
+import PropTypes from "prop-types";
 
+class VerticalCardList extends Component {
   state = {
     currentCard: 0,
     currentImage: 0,
@@ -52,6 +47,48 @@ class VerticalCardList extends Component {
 
   componentDidMount() {
     window.addEventListener("keydown", this.handleKeyPress);
+  }
+
+  validateKey(testKey, refKey) {
+    const res = testKey === refKey;
+    if (res) {
+      // {key, altKey, ctrlKey, metaKey}
+      return res;
+    }
+    // iterate all keys of testKey
+    if (typeof testKey === "object") {
+      let testKeyObject = {};
+      for (let prop in testKey) {
+        testKeyObject[prop] = testKey[prop];
+      }
+      return Object.keys(refKey).every(key => {
+        return testKeyObject[key] === refKey[key];
+      });
+    }
+  }
+
+  isZoomEscKey(code) {
+    return this.validateKey(code, this.props.zoomEscKey);
+  }
+
+  isZoomKey(code) {
+    return this.validateKey(code, this.props.zoomKey);
+  }
+
+  isUpKey(code) {
+    return this.validateKey(code, this.props.upKey);
+  }
+
+  isDownKey(code) {
+    return this.validateKey(code, this.props.downKey);
+  }
+
+  isLeftKey(code) {
+    return this.validateKey(code, this.props.leftKey);
+  }
+
+  isRightKey(code) {
+    return this.validateKey(code, this.props.rightKey);
   }
 
   setZoomed(code) {
@@ -71,36 +108,24 @@ class VerticalCardList extends Component {
     }
   }
 
-  isZoomEscKey(code) {
-    return code === this.zoomEscKey;
-  }
-
-  isZoomKey(code) {
-    return code === this.zoomKey;
-  }
-
-  isUpKey(code) {
-    return code === this.upKey;
-  }
-
-  isDownKey(code) {
-    return code === this.downKey;
-  }
-
-  isLeftKey(code) {
-    return code === this.leftKey;
-  }
-
-  isRightKey(code) {
-    return code === this.rightKey;
-  }
-
   moveSide(code) {
     const isLeftKey = this.isLeftKey(code);
     const isRightKey = this.isRightKey(code);
     if (isLeftKey || isRightKey) {
       this.setState(oldState => ({
         currentImage: this.getNextImage(isLeftKey, isRightKey)
+      }));
+    }
+  }
+
+  moveHor(code) {
+    const isUpKey = this.isUpKey(code);
+    const isDownKey = this.isDownKey(code);
+    if (isUpKey || isDownKey) {
+      const newCard = this.getNextCard(isUpKey, isDownKey);
+      this.setState(oldState => ({
+        currentCard: newCard,
+        currentImage: this.adjustNextCardImagePosition(newCard)
       }));
     }
   }
@@ -119,7 +144,10 @@ class VerticalCardList extends Component {
 
   handleKeyPress = this.handleKeyPress.bind(this);
   handleKeyPress(e) {
-    const { code } = e;
+    const { keyType } = this.props;
+    const { [keyType]: code = e } = e;
+    console.log(keyType, code, e);
+
     this.setZoomed(code);
     this.moveSide(code);
     this.moveHor(code);
@@ -141,18 +169,6 @@ class VerticalCardList extends Component {
     const limit = data.length;
     const currentPlusDiff = currentCard + diff;
     return this.move(currentPlusDiff, limit);
-  }
-
-  moveHor(code) {
-    const isUpKey = this.isUpKey(code);
-    const isDownKey = this.isDownKey(code);
-    if (isUpKey || isDownKey) {
-      const newCard = this.getNextCard(isUpKey, isDownKey);
-      this.setState(oldState => ({
-        currentCard: newCard,
-        currentImage: this.adjustNextCardImagePosition(newCard)
-      }));
-    }
   }
 
   adjustNextCardImagePosition(newCard) {
@@ -220,5 +236,40 @@ class VerticalCardList extends Component {
     );
   }
 }
+
+const StringOrNumberPropType = PropTypes.oneOfType([
+  PropTypes.string,
+  PropTypes.number,
+  PropTypes.shape({
+    key: PropTypes.string,
+    code: PropTypes.string,
+    keyCode: PropTypes.number,
+    altKey: PropTypes.bool,
+    ctrlKey: PropTypes.bool,
+    shiftKey: PropTypes.bool,
+    metaKey: PropTypes.bool
+  })
+]);
+
+VerticalCardList.propTypes = {
+  keyType: PropTypes.oneOf(["code", "keyCode", "key", "event"]),
+  zoomKey: StringOrNumberPropType,
+  leftKey: StringOrNumberPropType,
+  rightKey: StringOrNumberPropType,
+  upKey: StringOrNumberPropType,
+  downKey: StringOrNumberPropType,
+  zoomEscKey: StringOrNumberPropType
+};
+
+VerticalCardList.defaultProps = {
+  keyType: "key",
+//  zoomKey: { key: "g", ctrlKey: true, altKey: true },
+  zoomKey: "g",
+  leftKey: "h",
+  rightKey: "l",
+  upKey: "j",
+  downKey: "k",
+  zoomEscKey: "Escape"
+};
 
 export default VerticalCardList;
