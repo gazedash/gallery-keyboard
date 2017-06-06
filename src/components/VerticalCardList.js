@@ -37,7 +37,8 @@ import React, { Component } from "react";
 import Card from "./Card";
 import data from "../data.json";
 import PropTypes from "prop-types";
-import { validateKey, minusOneOrZeroOrOne, move } from "../utils";
+import { validateKey, getNext } from "../utils";
+
 class VerticalCardList extends Component {
   state = {
     currentCard: 0,
@@ -113,11 +114,12 @@ class VerticalCardList extends Component {
   }
 
   getNextImage(isLeftKey, isRightKey) {
-    const { currentImage } = this.state;
-    const diff = minusOneOrZeroOrOne(isLeftKey, isRightKey);
-    const limit = this.currentImagesLength;
-    const currentPlusDiff = currentImage + diff;
-    return move(currentPlusDiff, limit, true);
+    return getNext({
+      isPrevKey: isLeftKey,
+      isNextKey: isRightKey,
+      limit: this.currentImagesLength,
+      current: this.currentImage
+    });
   }
 
   handleKeyPress = this.handleKeyPress.bind(this);
@@ -132,8 +134,19 @@ class VerticalCardList extends Component {
   }
 
   get currentImagesLength() {
-    const { currentCard } = this.state;
-    return this.getImagesLength(currentCard);
+    return this.getImagesLength(this.currentCard);
+  }
+
+  get currentImage() {
+    return this.state.currentImage;
+  }
+
+  get currentCard() {
+    return this.state.currentCard;
+  }
+
+  get isZoomed() {
+    return this.state.isZoomed;
   }
 
   getImagesLength(index) {
@@ -141,22 +154,21 @@ class VerticalCardList extends Component {
   }
 
   getNextCard(isUpKey, isDownKey) {
-    const { currentCard } = this.state;
-    const diff = minusOneOrZeroOrOne(isUpKey, isDownKey);
-    const limit = data.length;
-    const currentPlusDiff = currentCard + diff;
-    return move(currentPlusDiff, limit);
+    return getNext({
+      isPrevKey: isUpKey,
+      isNextKey: isDownKey,
+      limit: data.length,
+      current: this.currentCard
+    });
   }
 
   adjustNextCardImagePosition(newCard) {
-    const { currentImage } = this.state;
     const newLimit = this.getImagesLength(newCard);
-    return currentImage >= newLimit ? 0 : currentImage;
+    return this.currentImage >= newLimit ? 0 : this.currentImage;
   }
 
   isCardActive(index) {
-    const { currentCard } = this.state;
-    return currentCard === index;
+    return this.currentCard === index;
   }
 
   mapDataToImages() {
@@ -176,13 +188,12 @@ class VerticalCardList extends Component {
   }
 
   renderCards() {
-    const { currentImage, isZoomed } = this.state;
     return this.mapDataToImages().map((e, index) => {
       return (
         <Card
-          isZoomed={isZoomed}
+          isZoomed={this.isZoomed}
           active={this.isCardActive(index)}
-          currentImageId={currentImage}
+          currentImageId={this.currentImage}
           key={e.name}
           items={e.items}
         />
