@@ -1,11 +1,8 @@
 import React, { Component } from "react";
-import CardItem from "./CardItem";
+import CardItem from "../CardItem";
 import PropTypes from "prop-types";
 
 class Card extends Component {
-  horizontalStyle = { display: "flex", flexWrap: "wrap", backgroundColor: this.props.active ? 'blue' : '#fff' };
-  verticalStyle = { display: "flex", flexDirection: "column"};
-
   get isZoomed() {
     return this.props.isZoomed;
   }
@@ -20,7 +17,7 @@ class Card extends Component {
 
   render() {
     return (
-      <div style={this.props.horizontal ? this.horizontalStyle : this.verticalStyle}>
+      <div style={this.props.style}>
         {this.props.items.map((item, i) => {
           const active = this.currentImageId === i && this.active;
           const isCurrentZoomed = this.isZoomed && active;
@@ -31,6 +28,9 @@ class Card extends Component {
               key={item.image}
               image={item.image}
               url={item.url}
+              style={this.props.itemStyle}
+              activeStyle={this.props.itemActiveStyle}
+              fixedStyle={this.props.itemFixedStyle}
             />
           );
         })}
@@ -44,13 +44,19 @@ Card.propTypes = {
   isZoomed: PropTypes.bool,
   active: PropTypes.bool,
   currentImageId: PropTypes.number,
-  horizontal: PropTypes.bool,
+  style: PropTypes.object,
+  itemStyle: PropTypes.object,
+  itemFixedStyle: PropTypes.object,
+  itemActiveStyle: PropTypes.object
 };
 
 Card.defaultProps = {
   items: [],
   isZoomed: false,
   horizontal: true,
+  itemStyle: null,
+  itemFixedStyle: null,
+  itemActiveStyle: null
 };
 
 export default Card;
