@@ -34,10 +34,10 @@
 // }
 // }
 import React, { Component } from "react";
-import Card from "./Card";
+import { CardHorizontal, CardVertical } from "./Card";
 import data from "../data.json";
 import PropTypes from "prop-types";
-import { validateKey, getNext } from "../utils";
+import { validateKey, getNext, capitalizeFirstLetter, isKey } from "../utils";
 
 class VerticalCardList extends Component {
   state = {
@@ -50,33 +50,9 @@ class VerticalCardList extends Component {
     window.addEventListener("keydown", this.handleKeyPress);
   }
 
-  isZoomEscKey(code) {
-    return validateKey(code, this.props.zoomEscKey);
-  }
-
-  isZoomKey(code) {
-    return validateKey(code, this.props.zoomKey);
-  }
-
-  isUpKey(code) {
-    return validateKey(code, this.props.upKey);
-  }
-
-  isDownKey(code) {
-    return validateKey(code, this.props.downKey);
-  }
-
-  isLeftKey(code) {
-    return validateKey(code, this.props.leftKey);
-  }
-
-  isRightKey(code) {
-    return validateKey(code, this.props.rightKey);
-  }
-
   setZoomed(code) {
     const { isZoomed } = this.state;
-    if (this.isZoomKey(code)) {
+    if (validateKey(code, this.props.zoomKey)) {
       this.setState({
         isZoomed: !isZoomed
       });
@@ -84,7 +60,8 @@ class VerticalCardList extends Component {
   }
 
   escapeZoom(code) {
-    if (this.isZoomEscKey(code)) {
+    const { isZoomed } = this.state;
+    if (validateKey(code, this.props.zoomEscKey) && isZoomed) {
       this.setState({
         isZoomed: false
       });
@@ -92,8 +69,8 @@ class VerticalCardList extends Component {
   }
 
   moveSide(code) {
-    const isLeftKey = this.isLeftKey(code);
-    const isRightKey = this.isRightKey(code);
+    const isLeftKey = validateKey(code, this.props.leftKey);
+    const isRightKey = validateKey(code, this.props.rightKey);
     if (isLeftKey || isRightKey) {
       this.setState(oldState => ({
         currentImage: this.getNextImage(isLeftKey, isRightKey)
@@ -102,8 +79,8 @@ class VerticalCardList extends Component {
   }
 
   moveHor(code) {
-    const isUpKey = this.isUpKey(code);
-    const isDownKey = this.isDownKey(code);
+    const isUpKey = validateKey(code, this.props.upKey);
+    const isDownKey = validateKey(code, this.props.downKey);
     if (isUpKey || isDownKey) {
       const newCard = this.getNextCard(isUpKey, isDownKey);
       this.setState(oldState => ({
@@ -188,8 +165,8 @@ class VerticalCardList extends Component {
     });
   }
 
-  horizontalStyle = { display: "flex", flexDirection: "column" }
-  verticalStyle = { display: "flex" }
+  horizontalStyle = { display: "flex", flexDirection: "column" };
+  verticalStyle = { display: "flex" };
   get horizontal() {
     return this.props.horizontal;
   }
@@ -197,28 +174,29 @@ class VerticalCardList extends Component {
     return this.props.style;
   }
   get style() {
-   if (this.propsStyle) {
-     return this.propsStyle;
-   }
-   if (this.horizontal) {
-     return this.horizontalStyle;
-   }
-   return this.verticalStyle;
+    if (this.propsStyle) {
+      return this.propsStyle;
+    }
+    if (this.horizontal) {
+      return this.horizontalStyle;
+    }
+    return this.verticalStyle;
   }
   renderCards() {
+    let Card = props => <CardVertical {...props} />;
+    if (this.horizontal) {
+      Card = props => <CardHorizontal {...props} />;
+    }
     return (
       <div style={this.style}>
         {this.mapDataToImages().map((e, index) => {
-          return (
-            <Card
-              horizontal={this.horizontal}
-              isZoomed={this.isZoomed}
-              active={this.isCardActive(index)}
-              currentImageId={this.currentImage}
-              key={e.name}
-              items={e.items}
-            />
-          );
+          return Card({
+            isZoomed: this.isZoomed,
+            active: this.isCardActive(index),
+            currentImageId: this.currentImage,
+            key: e.url,
+            items: e.items
+          });
         })}
       </div>
     );
@@ -256,7 +234,7 @@ VerticalCardList.propTypes = {
   downKey: StringOrNumberPropType,
   zoomEscKey: StringOrNumberPropType,
   style: PropTypes.object,
-  horizontal: PropTypes.bool,
+  horizontal: PropTypes.bool
 };
 
 VerticalCardList.defaultProps = {
@@ -269,7 +247,7 @@ VerticalCardList.defaultProps = {
   downKey: "k",
   zoomEscKey: "Escape",
   style: null,
-  horizontal: true,
+  horizontal: true
 };
 
 export default VerticalCardList;
