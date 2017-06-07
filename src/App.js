@@ -1,12 +1,12 @@
 import React, { Component } from "react";
 import "./App.css";
-import CardList from "./components/CardList";
+import {CardContainerVertical} from "./components/CardContainer";
 
 class App extends Component {
   render() {
     return (
       <div className="App">
-          <CardList />
+          <CardContainerVertical/>
       </div>
     );
   }

@@ -34,12 +34,13 @@
 // }
 // }
 import React, { Component } from "react";
-import { CardHorizontal, CardVertical } from "./Card";
-import data from "../data.json";
+import { Card } from "../Card";
+import CardList from "../CardList/CardList";
+import data from "../../data.json";
 import PropTypes from "prop-types";
-import { validateKey, getNext, capitalizeFirstLetter, isKey } from "../utils";
+import { validateKey, getNext } from "../../utils";
 
-class VerticalCardList extends Component {
+class CardContainer extends Component {
   state = {
     currentCard: 0,
     currentImage: 0,
@@ -149,65 +150,21 @@ class VerticalCardList extends Component {
     return this.currentCard === index;
   }
 
-  mapDataToImages() {
-    return data.map((item, index) => {
-      const { url, name, images } = item;
-      const items = images.map(image => ({
-        image,
-        url,
-        name
-      }));
-      return {
-        items,
-        url,
-        name
-      };
-    });
-  }
-
-  horizontalStyle = { display: "flex", flexDirection: "column" };
-  verticalStyle = { display: "flex" };
-  get horizontal() {
-    return this.props.horizontal;
-  }
-  get propsStyle() {
-    return this.props.style;
-  }
-  get style() {
-    if (this.propsStyle) {
-      return this.propsStyle;
-    }
-    if (this.horizontal) {
-      return this.horizontalStyle;
-    }
-    return this.verticalStyle;
-  }
   renderCards() {
-    let Card = props => <CardVertical {...props} />;
-    if (this.horizontal) {
-      Card = props => <CardHorizontal {...props} />;
-    }
     return (
-      <div style={this.style}>
-        {this.mapDataToImages().map((e, index) => {
-          return Card({
-            isZoomed: this.isZoomed,
-            active: this.isCardActive(index),
-            currentImageId: this.currentImage,
-            key: e.url,
-            items: e.items
-          });
-        })}
-      </div>
+      <CardList
+        isZoomed={this.isZoomed}
+        currentCard={this.currentCard}
+        currentImage={this.currentImage}
+        items={this.props.items}
+        style={this.props.style}
+        itemElement={this.props.itemElement}
+      />
     );
   }
 
   render() {
-    return (
-      <div>
-        {this.renderCards()}
-      </div>
-    );
+    return this.renderCards();
   }
 }
 
@@ -225,7 +182,7 @@ const StringOrNumberPropType = PropTypes.oneOfType([
   })
 ]);
 
-VerticalCardList.propTypes = {
+CardContainer.propTypes = {
   keyType: PropTypes.oneOf(["code", "keyCode", "key", "event"]),
   zoomKey: StringOrNumberPropType,
   leftKey: StringOrNumberPropType,
@@ -234,10 +191,11 @@ VerticalCardList.propTypes = {
   downKey: StringOrNumberPropType,
   zoomEscKey: StringOrNumberPropType,
   style: PropTypes.object,
-  horizontal: PropTypes.bool
+  items: PropTypes.array,
+  itemElement: PropTypes.object.isRequired
 };
 
-VerticalCardList.defaultProps = {
+CardContainer.defaultProps = {
   keyType: "key",
   //  zoomKey: { key: "g", ctrlKey: true, altKey: true },
   zoomKey: "g",
@@ -247,7 +205,24 @@ VerticalCardList.defaultProps = {
   downKey: "k",
   zoomEscKey: "Escape",
   style: null,
-  horizontal: true
+  items: mapDataToImages(),
+  itemElement: <Card />
 };
 
-export default VerticalCardList;
+function mapDataToImages() {
+  return data.map((item, index) => {
+    const { url, name, images } = item;
+    const items = images.map(image => ({
+      image,
+      url,
+      name
+    }));
+    return {
+      items,
+      url,
+      name
+    };
+  });
+}
+
+export default CardContainer;
