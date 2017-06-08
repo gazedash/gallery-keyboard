@@ -1,12 +1,22 @@
-import React, { Component } from "react";
+import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
-class CardItem extends Component {
+
+const style = {
+  opacity: 0.6
+};
+
+const activeStyle = {
+  opacity: 1
+};
+
+class CardItem extends PureComponent {
   defaultFixedStyle = {
     position: "fixed",
     top: "50%",
     left: "50%",
     marginTop: this.marginTop,
-    marginLeft: this.marginLeft
+    marginLeft: this.marginLeft,
+    zIndex: 100
   };
 
   get marginTop() {
@@ -69,12 +79,18 @@ class CardItem extends Component {
     const height = this.heightOrZoomHeight(zoomed);
     const width = this.widthOrZoomWidth(zoomed);
     return (
-      <div style={this.activeStyle}>
+      <div onClick={this.handleClick} style={this.activeStyle}>
         <a target="_blank" rel="noopener noreferrer" href={this.url}>
           <img height={height} width={width} src={this.image} alt="" />
         </a>
       </div>
     );
+  }
+
+  handleClick = this.handleClick.bind(this);
+  handleClick(e) {
+    e.preventDefault();
+    this.props.onClick({image: this.props.index});
   }
 
   renderFixed() {
@@ -105,8 +121,10 @@ CardItem.propTypes = {
   zoomHeight: PropTypes.number,
   zoomWidth: PropTypes.number,
   style: PropTypes.object,
+  index: PropTypes.number,
   fixedStyle: PropTypes.object,
-  activeStyle: PropTypes.object
+  activeStyle: PropTypes.object,
+  onClick: PropTypes.func
 };
 
 CardItem.defaultProps = {
@@ -118,7 +136,8 @@ CardItem.defaultProps = {
   zoomWidth: 600,
   style: null,
   fixedStyle: null,
-  activeStyle: null
+  activeStyle: null,
+  onClick: () => {}
 };
 
 export default CardItem;
