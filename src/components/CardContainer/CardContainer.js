@@ -35,7 +35,7 @@
 // }
 import React, { Component } from "react";
 import { Card } from "../Card";
-import CardList from "../CardList/CardList";
+import CardList from "../CardList";
 import data from "../../data.json";
 import PropTypes from "prop-types";
 import { validateKey, getNext } from "../../utils";
@@ -77,6 +77,29 @@ class CardContainer extends Component {
         currentImage: this.getNextImage(isLeftKey, isRightKey)
       }));
     }
+  }
+
+  setActive = this.setActive.bind(this);
+  setActive({ card, image }) {
+    const { currentCard, currentImage } = this.state;
+    if (currentCard !== card && currentImage !== image) {
+      this.setState(oldState => {
+        const { currentCard, currentImage } = oldState;
+        const newCard = card ? card : currentCard;
+        const newImage = image ? image : currentImage;
+        return {
+          currentCard: newCard,
+          currentImage: newImage
+        };
+      });
+    }
+    // } else {
+    //   this.setState(oldState => {
+    //     return {
+    //       isZoomed: !oldState.isZoomed
+    //     };
+    //   });
+    // }
   }
 
   moveHor(code) {
@@ -183,6 +206,7 @@ const StringOrNumberPropType = PropTypes.oneOfType([
 ]);
 
 CardContainer.propTypes = {
+  children: PropTypes.object,
   keyType: PropTypes.oneOf(["code", "keyCode", "key", "event"]),
   zoomKey: StringOrNumberPropType,
   leftKey: StringOrNumberPropType,
@@ -192,10 +216,11 @@ CardContainer.propTypes = {
   zoomEscKey: StringOrNumberPropType,
   style: PropTypes.object,
   items: PropTypes.array,
-  itemElement: PropTypes.object.isRequired
+  itemElement: PropTypes.object
 };
 
 CardContainer.defaultProps = {
+  children: <CardList />,
   keyType: "key",
   //  zoomKey: { key: "g", ctrlKey: true, altKey: true },
   zoomKey: "g",
