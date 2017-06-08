@@ -151,16 +151,16 @@ class CardContainer extends Component {
   }
 
   renderCards() {
-    return (
-      <CardList
-        isZoomed={this.isZoomed}
-        currentCard={this.currentCard}
-        currentImage={this.currentImage}
-        items={this.props.items}
-        style={this.props.style}
-        itemElement={this.props.itemElement}
-      />
-    );
+    const props = {
+      isZoomed: this.isZoomed,
+      currentCard: this.currentCard,
+      currentImage: this.currentImage,
+      items: this.props.items,
+      style: this.props.style,
+      itemElement: this.props.itemElement,
+      onClick: this.setActive
+    };
+    return React.cloneElement(this.props.children, props);
   }
 
   render() {
