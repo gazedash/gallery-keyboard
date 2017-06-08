@@ -3,7 +3,6 @@ import Card from "./Card";
 
 const style = {
   display: "flex",
-  flexWrap: "wrap"
 };
 
 export default props => (
