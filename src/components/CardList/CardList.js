@@ -1,4 +1,4 @@
-import React, { PureComponent, cloneElement } from "react";
+import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
 import { Card } from "../Card";
 
@@ -12,7 +12,7 @@ class CardList extends PureComponent {
     this.props.onClick({ card, image });
   }
 
-  renderItem(children, index, e) {
+  renderItem(Children, index, e) {
     const props = {
       isZoomed: this.props.isZoomed,
       active: this.isCardActive(index),
@@ -21,7 +21,7 @@ class CardList extends PureComponent {
       items: e.items,
       onClick: ({ image }) => this.handleClick({ image, card: index })
     };
-    return cloneElement(children, { ...props });
+    return <Children { ...props } />;
   }
 
   renderList() {
@@ -40,7 +40,7 @@ class CardList extends PureComponent {
 }
 
 CardList.propTypes = {
-  itemElement: PropTypes.object,
+  itemElement: PropTypes.func,
   isZoomed: PropTypes.bool,
   currentImage: PropTypes.number,
   currentCard: PropTypes.number,
@@ -50,7 +50,7 @@ CardList.propTypes = {
 };
 
 CardList.defaultProps = {
-  itemElement: <Card />,
+  itemElement: Card,
   isZoomed: false,
   items: [],
   style: null,
