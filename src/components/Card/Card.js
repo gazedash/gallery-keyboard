@@ -3,10 +3,6 @@ import CardItem from "../CardItem";
 import PropTypes from "prop-types";
 
 class Card extends PureComponent {
-  get isZoomed() {
-    return this.props.isZoomed;
-  }
-
   get active() {
     return this.props.active;
   }
@@ -19,20 +15,14 @@ class Card extends PureComponent {
     return this.currentImageId === index && this.active;
   }
 
-  isCurrentZoomed(i) {
-    return this.isCurrentActive(i) && this.isZoomed;
-  }
-
   render() {
     return (
       <div style={this.props.style}>
         {this.props.items.map((item, i) => {
           const active = this.isCurrentActive(i);
-          const isCurrentZoomed = this.isCurrentZoomed(i);
           return (
             <CardItem
               onClick={this.props.onClick}
-              isZoomed={isCurrentZoomed}
               active={active}
               key={item.image}
               image={item.image}
@@ -51,7 +41,6 @@ class Card extends PureComponent {
 
 Card.propTypes = {
   items: PropTypes.array,
-  isZoomed: PropTypes.bool,
   active: PropTypes.bool,
   currentImageId: PropTypes.number,
   style: PropTypes.object,
