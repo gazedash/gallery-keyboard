@@ -174,6 +174,7 @@ class CardContainer extends Component {
   }
 
   renderCards() {
+    const { listElement: ListElement } = this.props;
     const props = {
       isZoomed: this.isZoomed,
       currentCard: this.currentCard,
@@ -183,7 +184,7 @@ class CardContainer extends Component {
       itemElement: this.props.itemElement,
       onClick: this.setActive
     };
-    return React.cloneElement(this.props.children, props);
+    return <ListElement {...props} />;
   }
 
   render() {
@@ -206,7 +207,7 @@ const StringOrNumberPropType = PropTypes.oneOfType([
 ]);
 
 CardContainer.propTypes = {
-  children: PropTypes.object,
+  listElement: PropTypes.func,
   keyType: PropTypes.oneOf(["code", "keyCode", "key", "event"]),
   zoomKey: StringOrNumberPropType,
   leftKey: StringOrNumberPropType,
@@ -216,11 +217,11 @@ CardContainer.propTypes = {
   zoomEscKey: StringOrNumberPropType,
   style: PropTypes.object,
   items: PropTypes.array,
-  itemElement: PropTypes.object
+  itemElement: PropTypes.func
 };
 
 CardContainer.defaultProps = {
-  children: <CardList />,
+  listElement: CardList,
   keyType: "key",
   //  zoomKey: { key: "g", ctrlKey: true, altKey: true },
   zoomKey: "g",
@@ -231,7 +232,7 @@ CardContainer.defaultProps = {
   zoomEscKey: "Escape",
   style: null,
   items: mapDataToImages(),
-  itemElement: <Card />
+  itemElement: Card
 };
 
 function mapDataToImages() {

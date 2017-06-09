@@ -1,9 +1,13 @@
 import React from "react";
-import {CardVertical} from "../Card"
-import {CardContainer} from "./index";
+import { CardVertical } from "../Card";
+import { CardContainer } from "./index";
 
- const style = { display: "flex" };
+const style = { display: "flex" };
 
 export default props => (
-  <CardContainer {...props } itemElement={<CardVertical />} style={{ ...props.style, ...style }} />
+  <CardContainer
+    itemElement={CardVertical}
+    style={{ ...props.style, ...style }}
+    {...props}
+  />
 );
