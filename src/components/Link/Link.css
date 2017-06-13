@@ -1,0 +1,8 @@
+.root {
+  display: block;
+  text-decoration: none;
+}
+
+.root, .root:visited, .root:hover, .root:active {
+  color: inherit;
+}
