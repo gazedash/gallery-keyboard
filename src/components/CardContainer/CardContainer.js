@@ -38,13 +38,14 @@ import { Card } from "../Card";
 import { CardItemFixed } from "../CardItem";
 import CardList from "../CardList";
 import data from "../../data.json";
+// import data2 from "../../data2.json";
 import PropTypes from "prop-types";
 import { validateKey, getNext } from "../../utils";
-
+import styles from "./CardContainer.css";
 class CardContainer extends Component {
   state = {
-    currentCard: 0,
-    currentImage: 0,
+    activeRow: 0,
+    activeId: 0,
     isZoomed: false
   };
 
@@ -75,22 +76,22 @@ class CardContainer extends Component {
     const isRightKey = validateKey(code, this.props.rightKey);
     if (isLeftKey || isRightKey) {
       this.setState(oldState => ({
-        currentImage: this.getNextImage(isLeftKey, isRightKey)
+        activeId: this.getNextImage(isLeftKey, isRightKey)
       }));
     }
   }
 
   setActive = this.setActive.bind(this);
   setActive({ card = null, image = null }) {
-    const { currentCard, currentImage } = this.state;
-    if (!(currentCard === card && currentImage === image)) {
+    const { activeRow, activeId } = this.state;
+    if (!(activeRow === card && activeId === image)) {
       this.setState(oldState => {
-        const { currentCard, currentImage } = oldState;
-        const newCard = card !== null ? card : currentCard;
-        const newImage = image !== null ? image : currentImage;
+        const { activeRow, activeId } = oldState;
+        const newCard = card !== null ? card : activeRow;
+        const newImage = image !== null ? image : activeId;
         return {
-          currentCard: newCard,
-          currentImage: newImage
+          activeRow: newCard,
+          activeId: newImage
         };
       });
     }
@@ -109,8 +110,8 @@ class CardContainer extends Component {
     if (isUpKey || isDownKey) {
       const newCard = this.getNextCard(isUpKey, isDownKey);
       this.setState(oldState => ({
-        currentCard: newCard,
-        currentImage: this.adjustNextCardImagePosition(newCard)
+        activeRow: newCard,
+        activeId: this.adjustNextCardImagePosition(newCard)
       }));
     }
   }
@@ -119,8 +120,8 @@ class CardContainer extends Component {
     return getNext({
       isPrevKey: isLeftKey,
       isNextKey: isRightKey,
-      limit: this.currentImagesLength,
-      current: this.currentImage,
+      limit: this.activeIdsLength,
+      current: this.activeId,
       loop: true
     });
   }
@@ -136,16 +137,16 @@ class CardContainer extends Component {
     this.escapeZoom(code);
   }
 
-  get currentImagesLength() {
-    return this.getImagesLength(this.currentCard);
+  get activeIdsLength() {
+    return this.getImagesLength(this.activeRow);
   }
 
-  get currentImage() {
-    return this.state.currentImage;
+  get activeId() {
+    return this.state.activeId;
   }
 
-  get currentCard() {
-    return this.state.currentCard;
+  get activeRow() {
+    return this.state.activeRow;
   }
 
   get isZoomed() {
@@ -156,12 +157,11 @@ class CardContainer extends Component {
     return this.props.items[index].items.length;
   }
 
-  get currentCardItem() {
-    return this.props.items[this.currentCard];
+  get activeRowItem() {
+    return this.props.items[this.activeRow];
   }
-
-  get currentImageItem() {
-    return this.currentCardItem.items[this.currentImage];
+  get activeIdItem() {
+    return this.activeRowItem.items[this.activeId];
   }
 
   getNextCard(isUpKey, isDownKey) {
@@ -169,26 +169,27 @@ class CardContainer extends Component {
       isPrevKey: isUpKey,
       isNextKey: isDownKey,
       limit: this.props.items.length,
-      current: this.currentCard
+      current: this.activeRow
     });
   }
 
   adjustNextCardImagePosition(newCard) {
     const newLimit = this.getImagesLength(newCard);
-    return this.currentImage >= newLimit ? 0 : this.currentImage;
+    return this.activeId >= newLimit ? 0 : this.activeId;
   }
 
   isCardActive(index) {
-    return this.currentCard === index;
+    return this.activeRow === index;
   }
 
   renderFixed() {
     if (this.isZoomed) {
+      const { fixedElement: FixedElement } = this.props;
       return (
-        <CardItemFixed
-          active={true}
-          image={this.currentImageItem.image}
-          url={this.currentImageItem.url}
+        <FixedElement
+          isActive={true}
+          image={this.activeIdItem.image}
+          url={this.activeIdItem.url}
         />
       );
     }
@@ -198,10 +199,10 @@ class CardContainer extends Component {
   renderCards() {
     const { listElement: ListElement } = this.props;
     const props = {
-      currentCard: this.currentCard,
-      currentImage: this.currentImage,
+      activeRow: this.activeRow,
+      activeId: this.activeId,
       items: this.props.items,
-      style: this.props.style,
+      className: this.props.className,
       itemElement: this.props.itemElement,
       onClick: this.setActive
     };
@@ -218,7 +219,7 @@ class CardContainer extends Component {
   }
 }
 
-const StringOrNumberPropType = PropTypes.oneOfType([
+const StringOrNumberOrEventPropType = PropTypes.oneOfType([
   PropTypes.string,
   PropTypes.number,
   PropTypes.shape({
@@ -235,20 +236,22 @@ const StringOrNumberPropType = PropTypes.oneOfType([
 CardContainer.propTypes = {
   listElement: PropTypes.func,
   fixedElement: PropTypes.func,
+  itemElement: PropTypes.func,
   keyType: PropTypes.oneOf(["code", "keyCode", "key", "event"]),
-  zoomKey: StringOrNumberPropType,
-  leftKey: StringOrNumberPropType,
-  rightKey: StringOrNumberPropType,
-  upKey: StringOrNumberPropType,
-  downKey: StringOrNumberPropType,
-  zoomEscKey: StringOrNumberPropType,
-  style: PropTypes.object,
-  items: PropTypes.array,
-  itemElement: PropTypes.func
+  zoomKey: StringOrNumberOrEventPropType,
+  leftKey: StringOrNumberOrEventPropType,
+  rightKey: StringOrNumberOrEventPropType,
+  upKey: StringOrNumberOrEventPropType,
+  downKey: StringOrNumberOrEventPropType,
+  zoomEscKey: StringOrNumberOrEventPropType,
+  className: PropTypes.string,
+  items: PropTypes.array
 };
 
 CardContainer.defaultProps = {
   listElement: CardList,
+  fixedElement: CardItemFixed,
+  itemElement: Card,
   keyType: "key",
   //  zoomKey: { key: "g", ctrlKey: true, altKey: true },
   zoomKey: "g",
@@ -257,14 +260,25 @@ CardContainer.defaultProps = {
   upKey: "j",
   downKey: "k",
   zoomEscKey: "Escape",
-  style: null,
-  items: mapDataToImages(),
-  itemElement: Card,
-  fixedElement: CardItemFixed
+  className: styles.root,
+  items: mapDataToImages()
 };
 
+// function mapDataToImages2() {
+//   return data2.map((item, id) => {
+//     const items = item.items.map(image => ({
+//       image: image.url
+//     }));
+
+//     return {
+//       id,
+//       items
+//     };
+//   });
+// }
+
 function mapDataToImages() {
-  return data.map((item, index) => {
+  return data.map((item, id) => {
     const { url, name, images } = item;
     const items = images.map(image => ({
       image,
@@ -272,6 +286,7 @@ function mapDataToImages() {
       name
     }));
     return {
+      id,
       items,
       url,
       name
