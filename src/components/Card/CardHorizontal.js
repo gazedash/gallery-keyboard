@@ -1,10 +1,5 @@
 import React from "react";
 import Card from "./Card";
+// import styles from "./CardHorizontal.css";
 
-const style = {
-  display: "flex",
-};
-
-export default props => (
-  <Card {...props} style={{ ...props.style, ...style }} />
-);
+export default props => <Card {...props} />;
