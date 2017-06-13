@@ -23,7 +23,7 @@ export function minusOneOrZeroOrOne(first, second) {
 export function move(currentPlusDiff, limit, loop = false) {
   let res = 0;
   const lastIndex = limit - 1;
-  if (currentPlusDiff <= 0) {
+  if (currentPlusDiff < 0) {
     res = loop ? lastIndex : 0;
   } else {
     if (currentPlusDiff < limit) {
