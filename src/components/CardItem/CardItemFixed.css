@@ -1,0 +1,18 @@
+.root {
+  position: fixed;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 50%;
+  bottom: 50%;
+  margin: auto;
+  left: 0;
+  right: 0;
+  width: 600px;
+  height: 600px;
+}
+
+.active {
+    /*composes: root*/
+}
