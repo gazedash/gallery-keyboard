@@ -1,5 +1,6 @@
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
+import Link from "../Link";
 import styles from "./CardItem.css";
 
 class CardItem extends PureComponent {
@@ -7,17 +8,17 @@ class CardItem extends PureComponent {
     return this.props.image;
   }
 
-  get active() {
-    return this.props.active;
+  get isActive() {
+    return this.props.isActive;
   }
 
   get url() {
     return this.props.url;
   }
 
-  get activeStyle() {
-    const { activeStyle, style } = this.props;
-    return this.active && activeStyle ? activeStyle : style;
+  get className() {
+    const { isActive, activeClassName, className } = this.props;
+    return isActive ? activeClassName : className;
   }
 
   handleClick = this.handleClick.bind(this);
@@ -28,38 +29,41 @@ class CardItem extends PureComponent {
 
   render() {
     return (
-      <div style={this.props.style} onClick={this.handleClick}>
-        <a target="_blank" rel="noopener noreferrer" href={this.url}>
-          <img
-            height={this.props.height}
-            width={this.props.width}
-            src={this.image}
-            alt=""
-          />
-        </a>
-      </div>
+      <Link
+        href={this.url}
+        className={this.className}
+        onClick={this.handleClick}
+      >
+        <img
+          className={styles.image}
+          height={this.props.height}
+          width={this.props.width}
+          src={this.image}
+          alt=""
+        />
+      </Link>
     );
   }
 }
 
 CardItem.propTypes = {
+  className: PropTypes.string,
+  activeClassName: PropTypes.string,
   image: PropTypes.string,
   url: PropTypes.string,
-  active: PropTypes.bool,
+  isActive: PropTypes.bool,
   height: PropTypes.number,
   width: PropTypes.number,
-  style: PropTypes.object,
   index: PropTypes.number,
-  activeStyle: PropTypes.object,
   onClick: PropTypes.func
 };
 
 CardItem.defaultProps = {
-  active: false,
+  isActive: false,
   height: 128,
   width: 128,
-  style: null,
-  activeStyle: null,
+  className: styles.root,
+  activeClassName: styles.active,
   onClick: () => {}
 };
 

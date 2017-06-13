@@ -1,0 +1,9 @@
+.root {
+  opacity: 0.7;
+  display: flex;
+}
+
+.active {
+  /*composes: root;*/
+  opacity: 1;
+}

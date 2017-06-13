@@ -4,7 +4,7 @@ import { Card } from "../Card";
 
 class CardList extends PureComponent {
   isCardActive(index) {
-    return this.props.currentCard === index;
+    return this.props.activeRow === index;
   }
 
   handleClick = this.handleClick.bind(this);
@@ -12,27 +12,29 @@ class CardList extends PureComponent {
     this.props.onClick({ card, image });
   }
 
-  renderItem(Children, index, e) {
+  renderItem(index, e) {
+    const { itemElement: ItemElement, itemProps } = this.props;
+
     const props = {
-      isZoomed: this.props.isZoomed,
-      active: this.isCardActive(index),
-      currentImageId: this.props.currentImage,
-      key: e.url,
+      isActive: this.isCardActive(index),
+      activeId: this.props.activeId,
+      key: e.id,
       items: e.items,
-      onClick: ({ image }) => this.handleClick({ image, card: index })
+      onClick: ({ image }) => this.handleClick({ image, card: index }),
+      ...itemProps
     };
-    return <Children { ...props } />;
+    return <ItemElement {...props} />;
   }
 
   renderList() {
     return this.props.items.map((e, index) => {
-      return this.renderItem(this.props.itemElement, index, e);
+      return this.renderItem(index, e);
     });
   }
 
   render() {
     return (
-      <div style={this.props.style}>
+      <div className={this.props.className}>
         {this.renderList()}
       </div>
     );
@@ -41,19 +43,21 @@ class CardList extends PureComponent {
 
 CardList.propTypes = {
   itemElement: PropTypes.func,
-  isZoomed: PropTypes.bool,
-  currentImage: PropTypes.number,
-  currentCard: PropTypes.number,
+  itemProps: PropTypes.object,
+  activeId: PropTypes.number,
+  activeRow: PropTypes.number,
   items: PropTypes.array,
-  style: PropTypes.object,
+  className: PropTypes.string,
   onClick: PropTypes.func
 };
 
 CardList.defaultProps = {
   itemElement: Card,
-  isZoomed: false,
+  itemProps: {},
+  activeId: 0,
+  activeRow: 0,
   items: [],
-  style: null,
+  className: null,
   onClick: () => {}
 };
 

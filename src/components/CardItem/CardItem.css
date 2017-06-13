@@ -1,0 +1,13 @@
+.root {
+  opacity: 0.8;
+}
+
+.active {
+  border: 2px solid grey;
+  /*composes: root;*/
+  opacity: 1;
+}
+
+.image {
+  display: block;
+}
