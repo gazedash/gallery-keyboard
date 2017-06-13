@@ -1,0 +1,9 @@
+.root {
+  /*composes: root from "./Card.css";*/
+  flex-direction: column;
+}
+
+.active {
+  /*composes: root;*/
+  /*composes: active from "./Card.css"*/
+}
