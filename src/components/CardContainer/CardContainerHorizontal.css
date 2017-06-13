@@ -1,0 +1,4 @@
+.root {
+  /*composes: root from "./CardContainer.css";*/
+  flex-direction: column;
+}
